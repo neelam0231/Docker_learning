@@ -1,0 +1,86 @@
+version: "3.7"
+services:
+ mongon1: 
+  image:  mongo
+#  environment:
+#   - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/maradbuser
+#   - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/maradbpwd
+  command:  mongod  --replSet maradata --port 27018 --noauth
+  deploy:
+   replicas: 1
+   placement:
+    constraints:
+     - node.labels.mongo.replica == 1
+   restart_policy:
+    condition: on-failure
+  volumes:
+   - mongodbn1:/data/db
+   - mongodbcfgn1:/data/configdb
+  ports:
+   - "27018:27018"
+  networks:
+   - maradbnw
+  secrets:
+   - maradbuser
+   - maradbpwd    
+ mongon2: 
+  image:  mongo
+#  environment:
+#  - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/maradbuser
+#   - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/maradbpwd
+  command:  mongod  --replSet maradata --port 27019 --noauth
+  deploy:
+   replicas: 1
+   placement:
+    constraints:
+     - node.labels.mongo.replica == 2
+   restart_policy:
+    condition: on-failure
+  volumes:
+   - mongodbn2:/data/db
+   - mongodbcfgn2:/data/configdb
+  ports:
+   - "27019:27019"
+  networks:
+   - maradbnw
+  secrets:
+   - maradbuser
+   - maradbpwd
+ mongon3: 
+  image:  mongo
+#  environment:
+#   - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/maradbuser
+#   - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/maradbpwd
+  command:  mongod  --replSet maradata --port 27020 --noauth
+  deploy:
+   replicas: 1
+   placement:
+    constraints:
+     - node.labels.mongo.replica == 3
+   restart_policy:
+    condition: on-failure
+  volumes:
+   - mongodbn3:/data/db
+   - mongodbcfgn3:/data/configdb
+  ports:
+   - "27020:27020"
+  networks:
+   - maradbnw
+  secrets:
+   - maradbuser
+   - maradbpwd
+networks:
+ maradbnw:
+  external: true
+volumes:
+ mongodbn1:
+ mongodbn2:
+ mongodbn3:
+ mongodbcfgn1:
+ mongodbcfgn2:
+ mongodbcfgn3:
+secrets:
+ maradbuser:
+  external: true
+ maradbpwd:
+  external: true
